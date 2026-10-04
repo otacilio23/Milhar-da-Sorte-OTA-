@@ -1,0 +1,2447 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#050505">
+
+<title>Milhar da Sorte OTA</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    min-height:100vh;
+    background:
+        radial-gradient(circle at 50% 20%,#333 0%,#111 35%,#000 80%);
+    color:#fff;
+    font-family:Arial,Helvetica,sans-serif;
+    overflow-x:hidden;
+}
+
+body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    opacity:.08;
+    background-image:
+        radial-gradient(circle,#fff 1px,transparent 1px);
+    background-size:35px 35px;
+}
+
+.container{
+    width:min(1100px,100%);
+    margin:auto;
+    padding:20px;
+    position:relative;
+    z-index:2;
+}
+
+header{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+.logo{
+    font-size:clamp(30px,7vw,60px);
+    font-weight:900;
+    letter-spacing:3px;
+    color:#ffd700;
+    text-shadow:
+        0 0 10px #ffb000,
+        0 0 30px #ff7200;
+}
+
+.subtitle{
+    color:#aaa;
+    font-size:13px;
+    letter-spacing:5px;
+    margin-top:5px;
+}
+
+.panel{
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.07),
+            rgba(255,255,255,.015)
+        );
+    border:1px solid rgba(255,215,0,.35);
+    border-radius:22px;
+    padding:25px;
+    margin-bottom:20px;
+    box-shadow:
+        0 20px 60px rgba(0,0,0,.65),
+        inset 0 0 30px rgba(255,215,0,.03);
+    backdrop-filter:blur(8px);
+}
+
+.title{
+    text-align:center;
+    color:#ffd700;
+    font-size:20px;
+    font-weight:bold;
+    margin-bottom:18px;
+}
+
+.optional{
+    text-align:center;
+    color:#999;
+    font-size:13px;
+    margin-top:-10px;
+    margin-bottom:18px;
+}
+
+.choice-area{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:8px;
+}
+
+.digit{
+    width:65px;
+    height:75px;
+    border-radius:12px;
+    border:2px solid #555;
+    background:#050505;
+    color:#ffd700;
+    font-size:40px;
+    font-weight:bold;
+    text-align:center;
+    outline:none;
+    font-family:"Courier New",monospace;
+    box-shadow:inset 0 0 20px #000;
+}
+
+.digit:focus{
+    border-color:#ffd700;
+    box-shadow:
+        0 0 15px rgba(255,215,0,.5),
+        inset 0 0 20px #000;
+}
+
+.choice-buttons{
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:15px;
+}
+
+button{
+    border:none;
+    border-radius:12px;
+    padding:14px 22px;
+    font-size:15px;
+    font-weight:bold;
+    cursor:pointer;
+    transition:.2s;
+}
+
+button:hover{
+    transform:translateY(-2px);
+    filter:brightness(1.12);
+}
+
+button:active{
+    transform:scale(.97);
+}
+
+button:disabled{
+    opacity:.4;
+    cursor:not-allowed;
+    transform:none;
+}
+
+.confirm{
+    background:linear-gradient(135deg,#ffd700,#ff9800);
+    color:#111;
+}
+
+.random-choice{
+    background:linear-gradient(135deg,#7b2cff,#c400ff);
+    color:#fff;
+}
+
+.selected-box{
+    margin-top:20px;
+    text-align:center;
+    padding:15px;
+    background:#080808;
+    border:1px solid #333;
+    border-radius:15px;
+}
+
+.selected-label{
+    color:#888;
+    font-size:12px;
+    letter-spacing:2px;
+}
+
+.selected-number{
+    display:block;
+    color:#ffd700;
+    font-family:"Courier New",monospace;
+    font-size:38px;
+    font-weight:bold;
+    margin-top:5px;
+    text-shadow:0 0 15px #ffae00;
+}
+
+.mode{
+    margin-top:7px;
+    color:#aaa;
+    font-size:12px;
+}
+
+.status{
+    text-align:center;
+    padding:12px;
+    margin-top:15px;
+    border-radius:30px;
+    background:#0c0c0c;
+    color:#ccc;
+    border:1px solid #292929;
+}
+
+.draw-label{
+    text-align:center;
+    color:#999;
+    letter-spacing:3px;
+    font-size:13px;
+    margin-bottom:12px;
+}
+
+.display{
+    width:100%;
+    max-width:800px;
+    margin:auto;
+    padding:30px 10px;
+    background:#020202;
+    border:3px solid #555;
+    border-radius:22px;
+    text-align:center;
+    box-shadow:
+        inset 0 0 45px #000,
+        0 0 30px rgba(255,215,0,.2);
+    overflow:hidden;
+}
+
+.number{
+    font-family:"Courier New",monospace;
+    font-size:clamp(65px,17vw,145px);
+    line-height:1;
+    font-weight:900;
+    letter-spacing:clamp(3px,2vw,15px);
+    color:#ffd700;
+    text-shadow:
+        0 0 8px #ffd700,
+        0 0 25px #ffae00,
+        0 0 55px #ff6500;
+}
+
+.girando{
+    animation:girar .10s infinite alternate;
+}
+
+@keyframes girar{
+    from{
+        transform:scale(1);
+        filter:blur(.5px);
+    }
+
+    to{
+        transform:scale(1.04);
+        filter:blur(2px);
+    }
+}
+
+.result{
+    min-height:100px;
+    text-align:center;
+    padding:20px;
+}
+
+.result h2{
+    font-size:32px;
+    margin-bottom:10px;
+}
+
+.win{
+    color:#ffd700;
+    text-shadow:0 0 20px #ffae00;
+    animation:pulsar .7s infinite alternate;
+}
+
+@keyframes pulsar{
+    from{
+        transform:scale(1);
+    }
+
+    to{
+        transform:scale(1.06);
+    }
+}
+
+.lose{
+    color:#ff5555;
+}
+
+.result-number{
+    font-family:"Courier New",monospace;
+    font-size:45px;
+    font-weight:bold;
+    color:#fff;
+}
+
+/* =====================================================
+   MULTIPLICADOR
+===================================================== */
+
+.multiplicador{
+    display:inline-block;
+    margin-top:10px;
+    padding:8px 25px;
+    border-radius:12px;
+    font-size:42px;
+    font-weight:900;
+    color:#ffd700;
+    background:#080808;
+    border:2px solid #ffd700;
+    text-shadow:
+        0 0 10px #ffd700,
+        0 0 25px #ff8c00;
+    box-shadow:
+        0 0 15px rgba(255,215,0,.4),
+        inset 0 0 15px rgba(255,215,0,.08);
+    animation:multiplicadorPulse .7s infinite alternate;
+}
+
+.tipo-acerto{
+    color:#fff;
+    font-size:18px;
+    font-weight:bold;
+    letter-spacing:2px;
+    margin-top:12px;
+}
+
+@keyframes multiplicadorPulse{
+    from{
+        transform:scale(1);
+    }
+
+    to{
+        transform:scale(1.10);
+    }
+}
+
+/* =====================================================
+   NÚMEROS ACERTADOS
+===================================================== */
+
+.numero-acertado{
+    display:inline-block;
+    font-weight:900;
+    animation:
+        destaqueNumero .75s infinite alternate,
+        mudaCorNumero 2s infinite linear;
+    transform-origin:center;
+}
+
+.digito-acertado{
+    display:inline-block;
+    font-weight:900;
+    animation:
+        destaqueDigito .75s infinite alternate,
+        mudaCorNumero 2s infinite linear;
+    transform-origin:center;
+}
+
+@keyframes destaqueNumero{
+    0%{
+        transform:scale(1);
+        filter:brightness(1);
+    }
+
+    100%{
+        transform:scale(1.12);
+        filter:brightness(1.6);
+    }
+}
+
+@keyframes destaqueDigito{
+    0%{
+        transform:scale(1);
+        filter:brightness(1);
+    }
+
+    100%{
+        transform:scale(1.35);
+        filter:brightness(1.8);
+    }
+}
+
+@keyframes mudaCorNumero{
+
+    0%{
+        color:#ffd700;
+        text-shadow:
+            0 0 5px #ffd700,
+            0 0 15px #ffd700;
+    }
+
+    20%{
+        color:#ff3030;
+        text-shadow:
+            0 0 5px #ff3030,
+            0 0 20px #ff3030;
+    }
+
+    40%{
+        color:#00eaff;
+        text-shadow:
+            0 0 5px #00eaff,
+            0 0 20px #00eaff;
+    }
+
+    60%{
+        color:#39ff14;
+        text-shadow:
+            0 0 5px #39ff14,
+            0 0 20px #39ff14;
+    }
+
+    80%{
+        color:#ff00ff;
+        text-shadow:
+            0 0 5px #ff00ff,
+            0 0 20px #ff00ff;
+    }
+
+    100%{
+        color:#ffd700;
+        text-shadow:
+            0 0 5px #ffd700,
+            0 0 20px #ffd700;
+    }
+}
+
+/* =====================================================
+   CONTROLES
+===================================================== */
+
+.controls{
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:12px;
+    margin-top:15px;
+}
+
+.start{
+    min-width:220px;
+    padding:20px 30px;
+    font-size:25px;
+    background:linear-gradient(135deg,#b00000,#ff2020);
+    color:white;
+    box-shadow:0 0 25px rgba(255,0,0,.35);
+}
+
+.new{
+    background:linear-gradient(135deg,#00d4ff,#007cff);
+    color:white;
+}
+
+.end{
+    background:#222;
+    color:white;
+    border:1px solid #777;
+}
+
+.secondary{
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:15px;
+}
+
+.secondary button{
+    background:#151515;
+    color:#ddd;
+    border:1px solid #444;
+}
+
+/* =====================================================
+   ESTATÍSTICAS
+===================================================== */
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+}
+
+.stat{
+    background:#090909;
+    border:1px solid #333;
+    border-radius:12px;
+    padding:15px 5px;
+    text-align:center;
+}
+
+.stat span{
+    display:block;
+    color:#888;
+    font-size:11px;
+}
+
+.stat strong{
+    display:block;
+    color:#ffd700;
+    font-size:24px;
+    margin-top:5px;
+}
+
+/* =====================================================
+   HISTÓRICO
+===================================================== */
+
+.history{
+    width:100%;
+    border-collapse:collapse;
+}
+
+.history th,
+.history td{
+    padding:10px 5px;
+    text-align:center;
+    border-bottom:1px solid #292929;
+    font-size:13px;
+}
+
+.history th{
+    color:#ffd700;
+}
+
+.empty{
+    text-align:center;
+    color:#777;
+    padding:20px;
+}
+
+/* =====================================================
+   APOIE NOSSO PROJETO — MERCADO PAGO
+===================================================== */
+
+.apoio-projeto{
+    text-align:center;
+    margin:25px 0;
+}
+
+.apoio-box{
+    background:
+        linear-gradient(
+            145deg,
+            rgba(0,200,255,.10),
+            rgba(255,215,0,.06)
+        );
+    border:1px solid rgba(0,210,255,.45);
+    border-radius:22px;
+    padding:25px 20px;
+    box-shadow:
+        0 15px 40px rgba(0,0,0,.5),
+        inset 0 0 25px rgba(0,200,255,.04);
+}
+
+.apoio-titulo{
+    color:#ffd700;
+    font-size:22px;
+    font-weight:900;
+    margin-bottom:8px;
+}
+
+.apoio-texto{
+    color:#aaa;
+    font-size:14px;
+    line-height:1.5;
+    margin-bottom:18px;
+}
+
+.botao-apoio{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    min-width:250px;
+    padding:16px 25px;
+    border-radius:14px;
+    background:linear-gradient(
+        135deg,
+        #00b8ff,
+        #0070f3
+    );
+    color:#fff;
+    text-decoration:none;
+    font-size:17px;
+    font-weight:900;
+    box-shadow:
+        0 0 15px rgba(0,180,255,.35);
+    transition:.25s;
+    animation:apoioPulse 1.8s infinite alternate;
+}
+
+.botao-apoio:hover{
+    transform:translateY(-3px) scale(1.03);
+    filter:brightness(1.15);
+    box-shadow:
+        0 0 25px rgba(0,200,255,.65);
+}
+
+.botao-apoio:active{
+    transform:scale(.97);
+}
+
+@keyframes apoioPulse{
+
+    from{
+        box-shadow:
+            0 0 10px rgba(0,180,255,.25);
+    }
+
+    to{
+        box-shadow:
+            0 0 25px rgba(0,200,255,.65);
+    }
+}
+
+/* =====================================================
+   MODAL
+===================================================== */
+
+.modal{
+    position:fixed;
+    inset:0;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,0,0,.9);
+    z-index:100;
+    padding:20px;
+}
+
+.modal.show{
+    display:flex;
+}
+
+.modal-box{
+    width:min(430px,100%);
+    background:#111;
+    border:2px solid #ffd700;
+    border-radius:20px;
+    padding:30px;
+    text-align:center;
+}
+
+.modal-box h2{
+    color:#ffd700;
+    margin-bottom:15px;
+}
+
+.modal-box p{
+    color:#aaa;
+    margin-bottom:20px;
+}
+
+.modal-buttons{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+}
+
+.confirm-end{
+    background:#d00000;
+    color:white;
+}
+
+.cancel-end{
+    background:#333;
+    color:white;
+}
+
+/* =====================================================
+   CONFETES
+===================================================== */
+
+.confete{
+    position:fixed;
+    top:-30px;
+    width:10px;
+    height:18px;
+    z-index:90;
+    animation:queda 4s linear forwards;
+}
+
+@keyframes queda{
+    to{
+        transform:
+            translateY(110vh)
+            rotate(720deg);
+        opacity:0;
+    }
+}
+
+.footer{
+    text-align:center;
+    color:#555;
+    font-size:11px;
+    margin:20px;
+}
+
+@media(max-width:650px){
+
+    .panel{
+        padding:15px;
+    }
+
+    .digit{
+        width:56px;
+        height:65px;
+        font-size:32px;
+    }
+
+    .controls{
+        flex-direction:column;
+    }
+
+    .controls button{
+        width:100%;
+    }
+
+    .stats{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .number{
+        letter-spacing:3px;
+    }
+
+    .multiplicador{
+        font-size:34px;
+    }
+
+    .botao-apoio{
+        width:100%;
+        min-width:0;
+    }
+
+}
+
+@media(max-width:390px){
+
+    .digit{
+        width:50px;
+        height:60px;
+        font-size:29px;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+
+    <div class="logo">
+        🎰 MILHAR DA SORTE
+    </div>
+
+    <div class="subtitle">
+        OTA • JOGO RECREATIVO
+    </div>
+
+</header>
+
+
+<!-- =====================================================
+     ESCOLHA DA MILHAR
+===================================================== -->
+
+<section class="panel">
+
+    <div class="title">
+        MILHAR SELECIONADA
+    </div>
+
+    <div class="optional">
+        ESCOLHA MANUALMENTE OU DEIXE O SISTEMA ESCOLHER
+    </div>
+
+    <div class="choice-area">
+
+        <input
+            id="d1"
+            class="digit"
+            maxlength="1"
+            inputmode="numeric"
+        >
+
+        <input
+            id="d2"
+            class="digit"
+            maxlength="1"
+            inputmode="numeric"
+        >
+
+        <input
+            id="d3"
+            class="digit"
+            maxlength="1"
+            inputmode="numeric"
+        >
+
+        <input
+            id="d4"
+            class="digit"
+            maxlength="1"
+            inputmode="numeric"
+        >
+
+    </div>
+
+    <div class="choice-buttons">
+
+        <button class="confirm" id="confirmar">
+            ✅ CONFIRMAR ESCOLHA
+        </button>
+
+        <button class="random-choice" id="aleatoria">
+            🎲 ESCOLHER ALEATORIAMENTE
+        </button>
+
+    </div>
+
+    <div class="selected-box">
+
+        <span class="selected-label">
+            MILHAR ATUAL
+        </span>
+
+        <strong class="selected-number" id="milhar">
+            ----
+        </strong>
+
+        <div class="mode" id="modo">
+            Nenhuma escolha realizada
+        </div>
+
+    </div>
+
+    <div class="status" id="status">
+        🟢 PRONTO PARA O SORTEIO
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     SORTEIO
+===================================================== -->
+
+<section class="panel">
+
+    <div class="draw-label">
+        NÚMERO SORTEADO
+    </div>
+
+    <div class="display">
+
+        <div class="number" id="numero">
+            0000
+        </div>
+
+    </div>
+
+    <div class="result" id="resultado"></div>
+
+    <div class="controls">
+
+        <button class="start" id="start">
+            ▶ START
+        </button>
+
+        <button class="new" id="novo">
+            🔄 NOVO JOGO
+        </button>
+
+        <button class="end" id="fim">
+            ⛔ FIM
+        </button>
+
+    </div>
+
+    <div class="secondary">
+
+        <button id="som">
+            🔊 SOM
+        </button>
+
+        <button id="fullscreen">
+            ⛶ TELA CHEIA
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     ESTATÍSTICAS
+===================================================== -->
+
+<section class="panel">
+
+    <div class="title">
+        ESTATÍSTICAS DA SESSÃO
+    </div>
+
+    <div class="stats">
+
+        <div class="stat">
+            <span>RODADAS</span>
+            <strong id="rodadas">0</strong>
+        </div>
+
+        <div class="stat">
+            <span>ACERTOS</span>
+            <strong id="acertos">0</strong>
+        </div>
+
+        <div class="stat">
+            <span>NÃO ACERTOS</span>
+            <strong id="naoAcertos">0</strong>
+        </div>
+
+        <div class="stat">
+            <span>TAXA</span>
+            <strong id="taxa">0%</strong>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     HISTÓRICO
+===================================================== -->
+
+<section class="panel">
+
+    <div class="title">
+        HISTÓRICO DOS SORTEIOS
+    </div>
+
+    <div id="historico">
+
+        <div class="empty">
+            Nenhuma rodada realizada.
+        </div>
+
+    </div>
+
+    <div class="secondary">
+
+        <button id="limpar">
+            🗑 LIMPAR HISTÓRICO
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     APOIE NOSSO PROJETO
+===================================================== -->
+
+<section class="apoio-projeto">
+
+    <div class="apoio-box">
+
+        <div class="apoio-titulo">
+            ❤️ APOIE NOSSO PROJETO
+        </div>
+
+        <div class="apoio-texto">
+            Gostou do nosso projeto?
+            Sua contribuição ajuda a manter,
+            melhorar e criar novas funcionalidades.
+        </div>
+
+        <a
+            class="botao-apoio"
+            href="https://mpago.la/24cm9rj"
+            target="_blank"
+            rel="noopener noreferrer"
+        >
+            💙 APOIAR VIA MERCADO PAGO
+        </a>
+
+    </div>
+
+</section>
+
+
+<div class="footer">
+    MILHAR DA SORTE OTA • EXCLUSIVAMENTE RECREATIVO
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     MODAL
+===================================================== -->
+
+<div class="modal" id="modal">
+
+    <div class="modal-box">
+
+        <h2>
+            ENCERRAR JOGO?
+        </h2>
+
+        <p>
+            Deseja realmente encerrar o jogo?
+        </p>
+
+        <div class="modal-buttons">
+
+            <button class="confirm-end" id="confirmarFim">
+                SIM — ENCERRAR
+            </button>
+
+            <button class="cancel-end" id="cancelarFim">
+                NÃO — CONTINUAR
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   ESTADO
+===================================================== */
+
+let sorteando = false;
+
+let somAtivo = true;
+
+let milharEscolhida = null;
+
+let modoEscolha = null;
+
+let rodadas = 0;
+
+let acertos = 0;
+
+let naoAcertos = 0;
+
+let historico = [];
+
+let timer = null;
+
+let audioContext = null;
+
+
+/* =====================================================
+   ELEMENTOS
+===================================================== */
+
+const d1 = document.getElementById("d1");
+const d2 = document.getElementById("d2");
+const d3 = document.getElementById("d3");
+const d4 = document.getElementById("d4");
+
+const inputs = [d1,d2,d3,d4];
+
+const confirmar =
+    document.getElementById("confirmar");
+
+const aleatoria =
+    document.getElementById("aleatoria");
+
+const start =
+    document.getElementById("start");
+
+const novo =
+    document.getElementById("novo");
+
+const fim =
+    document.getElementById("fim");
+
+const numero =
+    document.getElementById("numero");
+
+const milhar =
+    document.getElementById("milhar");
+
+const modo =
+    document.getElementById("modo");
+
+const status =
+    document.getElementById("status");
+
+const resultado =
+    document.getElementById("resultado");
+
+const rodadasEl =
+    document.getElementById("rodadas");
+
+const acertosEl =
+    document.getElementById("acertos");
+
+const naoAcertosEl =
+    document.getElementById("naoAcertos");
+
+const taxaEl =
+    document.getElementById("taxa");
+
+const historicoEl =
+    document.getElementById("historico");
+
+const limpar =
+    document.getElementById("limpar");
+
+const som =
+    document.getElementById("som");
+
+const fullscreen =
+    document.getElementById("fullscreen");
+
+const modal =
+    document.getElementById("modal");
+
+const confirmarFim =
+    document.getElementById("confirmarFim");
+
+const cancelarFim =
+    document.getElementById("cancelarFim");
+
+
+/* =====================================================
+   ENTRADA DOS DÍGITOS
+===================================================== */
+
+inputs.forEach((input,index)=>{
+
+    input.addEventListener("input",()=>{
+
+        input.value =
+            input.value
+            .replace(/\D/g,"")
+            .slice(0,1);
+
+        if(input.value){
+
+            modoEscolha = "manual";
+
+        }
+
+        if(
+            input.value &&
+            index < 3
+        ){
+
+            inputs[index+1].focus();
+
+        }
+
+    });
+
+
+    input.addEventListener(
+        "keydown",
+        event=>{
+
+            if(
+                event.key === "Backspace" &&
+                !input.value &&
+                index > 0
+            ){
+
+                inputs[index-1].focus();
+
+            }
+
+        }
+    );
+
+});
+
+
+/* =====================================================
+   GERADOR ALEATÓRIO
+===================================================== */
+
+function gerarMilharAleatoria(){
+
+    if(
+        window.crypto &&
+        window.crypto.getRandomValues
+    ){
+
+        const array =
+            new Uint32Array(1);
+
+        window.crypto.getRandomValues(
+            array
+        );
+
+        const valor =
+            array[0] % 10000;
+
+        return String(valor)
+            .padStart(4,"0");
+
+    }
+
+    return String(
+        Math.floor(
+            Math.random()*10000
+        )
+    ).padStart(4,"0");
+
+}
+
+
+/* =====================================================
+   CONFIRMAR ESCOLHA MANUAL
+===================================================== */
+
+confirmar.addEventListener(
+    "click",
+    ()=>{
+
+        if(sorteando)
+            return;
+
+        const valor =
+            inputs
+            .map(input=>input.value)
+            .join("");
+
+        if(valor.length !== 4){
+
+            status.textContent =
+                "⚠️ DIGITE OS 4 DÍGITOS DA MILHAR.";
+
+            return;
+
+        }
+
+        milharEscolhida =
+            valor.padStart(4,"0");
+
+        modoEscolha =
+            "manual";
+
+        milhar.textContent =
+            milharEscolhida;
+
+        modo.textContent =
+            "✋ ESCOLHA MANUAL CONFIRMADA";
+
+        status.textContent =
+            "🟡 MILHAR MANUAL CONFIRMADA — PRESSIONE START";
+
+        resultado.innerHTML = "";
+
+    }
+);
+
+
+/* =====================================================
+   ESCOLHER ALEATORIAMENTE
+===================================================== */
+
+aleatoria.addEventListener(
+    "click",
+    ()=>{
+
+        if(sorteando)
+            return;
+
+        milharEscolhida =
+            gerarMilharAleatoria();
+
+        modoEscolha =
+            "manual";
+
+        mostrarMilharNosCampos(
+            milharEscolhida
+        );
+
+        milhar.textContent =
+            milharEscolhida;
+
+        modo.textContent =
+            "🎲 MILHAR ESCOLHIDA ALEATORIAMENTE PELO JOGADOR";
+
+        status.textContent =
+            "🟡 MILHAR SELECIONADA — PRESSIONE START";
+
+        resultado.innerHTML = "";
+
+    }
+);
+
+
+/* =====================================================
+   MOSTRAR MILHAR NOS CAMPOS
+===================================================== */
+
+function mostrarMilharNosCampos(valor){
+
+    inputs.forEach(
+        (input,index)=>{
+
+            input.value =
+                valor[index];
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   START
+===================================================== */
+
+start.addEventListener(
+    "click",
+    iniciarSorteio
+);
+
+
+function iniciarSorteio(){
+
+    if(sorteando)
+        return;
+
+    sorteando = true;
+
+    start.disabled = true;
+
+    novo.disabled = true;
+
+    confirmar.disabled = true;
+
+    aleatoria.disabled = true;
+
+    resultado.innerHTML = "";
+
+    if(!milharEscolhida){
+
+        milharEscolhida =
+            gerarMilharAleatoria();
+
+        modoEscolha =
+            "automatico";
+
+        milhar.textContent =
+            milharEscolhida;
+
+        modo.textContent =
+            "🤖 ESCOLHA AUTOMÁTICA DO SISTEMA";
+
+    }
+
+    status.textContent =
+        "🔴 SORTEIO EM ANDAMENTO...";
+
+    prepararAudio();
+
+    numero.classList.add(
+        "girando"
+    );
+
+    const resultadoFinal =
+        gerarMilharAleatoria();
+
+    const inicio =
+        Date.now();
+
+    const duracao =
+        6000;
+
+    function animar(){
+
+        if(!sorteando)
+            return;
+
+        const tempo =
+            Date.now()-inicio;
+
+        const progresso =
+            Math.min(
+                tempo/duracao,
+                1
+            );
+
+        numero.textContent =
+            gerarMilharAleatoria();
+
+        if(progresso < 1){
+
+            const velocidade =
+                35 +
+                progresso*300;
+
+            timer =
+                setTimeout(
+                    animar,
+                    velocidade
+                );
+
+        }else{
+
+            finalizarSorteio(
+                resultadoFinal
+            );
+
+        }
+
+    }
+
+    iniciarSomSorteio();
+
+    animar();
+
+}
+
+
+/* =====================================================
+   DESTACAR NÚMEROS ACERTADOS
+===================================================== */
+
+function destacarAcerto(
+    escolhido,
+    sorteado,
+    tipo
+){
+
+    let quantidade = 0;
+
+    if(tipo === "MILHAR"){
+        quantidade = 4;
+    }
+
+    else if(tipo === "CENTENA"){
+        quantidade = 3;
+    }
+
+    else if(tipo === "DEZENA"){
+        quantidade = 2;
+    }
+
+    else if(tipo === "UNIDADE"){
+        quantidade = 1;
+    }
+
+    if(quantidade === 0){
+        return sorteado;
+    }
+
+    const inicio =
+        4 - quantidade;
+
+    let html = "";
+
+    for(let i=0; i<4; i++){
+
+        const acertado =
+            i >= inicio;
+
+        if(acertado){
+
+            html += `
+                <span class="digito-acertado">
+                    ${sorteado[i]}
+                </span>
+            `;
+
+        }else{
+
+            html += sorteado[i];
+
+        }
+
+    }
+
+    return html;
+
+}
+
+
+/* =====================================================
+   FINAL DO SORTEIO
+===================================================== */
+
+function finalizarSorteio(
+    resultadoFinal
+){
+
+    clearTimeout(timer);
+
+    sorteando = false;
+
+    numero.classList.remove(
+        "girando"
+    );
+
+    numero.textContent =
+        resultadoFinal;
+
+
+    const escolhido =
+        String(milharEscolhida)
+        .padStart(4,"0");
+
+    const sorteado =
+        String(resultadoFinal)
+        .padStart(4,"0");
+
+
+    let tipoAcerto = null;
+
+    let multiplicador = null;
+
+
+    if(
+        escolhido === sorteado
+    ){
+
+        tipoAcerto =
+            "MILHAR";
+
+        multiplicador =
+            "X100";
+
+    }
+
+    else if(
+        escolhido.slice(-3) ===
+        sorteado.slice(-3)
+    ){
+
+        tipoAcerto =
+            "CENTENA";
+
+        multiplicador =
+            "X50";
+
+    }
+
+    else if(
+        escolhido.slice(-2) ===
+        sorteado.slice(-2)
+    ){
+
+        tipoAcerto =
+            "DEZENA";
+
+        multiplicador =
+            "X10";
+
+    }
+
+    else if(
+        escolhido.slice(-1) ===
+        sorteado.slice(-1)
+    ){
+
+        tipoAcerto =
+            "UNIDADE";
+
+        multiplicador =
+            "X5";
+
+    }
+
+
+    const acertou =
+        multiplicador !== null;
+
+
+    rodadas++;
+
+
+    if(acertou){
+
+        acertos++;
+
+
+        resultado.innerHTML = `
+
+            <h2 class="win">
+                🎉 PARABÉNS! 🎉
+            </h2>
+
+            <h2 class="win">
+                VOCÊ ACERTOU!
+            </h2>
+
+            <div class="result-number numero-acertado">
+                ${
+                    destacarAcerto(
+                        escolhido,
+                        sorteado,
+                        tipoAcerto
+                    )
+                }
+            </div>
+
+            <p style="
+                color:#aaa;
+                margin-top:10px;
+            ">
+                SUA MILHAR:
+                ${escolhido}
+            </p>
+
+            <div class="tipo-acerto">
+                🎯 ${tipoAcerto}
+            </div>
+
+            <div class="multiplicador">
+                ${multiplicador}
+            </div>
+
+        `;
+
+
+        status.textContent =
+            `🏆 ${tipoAcerto} — ${multiplicador}`;
+
+
+        tocarSomVitoria();
+
+        criarConfetes();
+
+
+    }else{
+
+        naoAcertos++;
+
+
+        resultado.innerHTML = `
+
+            <h2 class="lose">
+                ❌ NÃO FOI DESSA VEZ
+            </h2>
+
+            <p style="
+                color:#999;
+                margin:12px 0 5px;
+            ">
+                SUA MILHAR
+            </p>
+
+            <div class="result-number">
+                ${escolhido}
+            </div>
+
+            <p style="
+                color:#999;
+                margin:12px 0 5px;
+            ">
+                MILHAR SORTEADA
+            </p>
+
+            <div class="result-number">
+                ${sorteado}
+            </div>
+
+        `;
+
+
+        status.textContent =
+            "🟢 RESULTADO FINAL";
+
+
+        tocarSomResultado();
+
+    }
+
+
+    historico.unshift({
+
+        rodada:rodadas,
+
+        escolhida:
+            escolhido,
+
+        sorteada:
+            sorteado,
+
+        acertou:
+            acertou,
+
+        tipo:
+            tipoAcerto || "NÃO ACERTO",
+
+        multiplicador:
+            multiplicador || "—"
+
+    });
+
+
+    if(historico.length > 10){
+
+        historico.pop();
+
+    }
+
+
+    atualizarTudo();
+
+
+    novo.disabled = false;
+
+    start.disabled = false;
+
+    confirmar.disabled = false;
+
+    aleatoria.disabled = false;
+
+}
+
+
+/* =====================================================
+   NOVO JOGO
+===================================================== */
+
+novo.addEventListener(
+    "click",
+    novoJogo
+);
+
+
+function novoJogo(){
+
+    clearTimeout(timer);
+
+    sorteando = false;
+
+    pararSom();
+
+    numero.classList.remove(
+        "girando"
+    );
+
+    numero.textContent =
+        "0000";
+
+    milharEscolhida =
+        null;
+
+    modoEscolha =
+        null;
+
+    milhar.textContent =
+        "----";
+
+    modo.textContent =
+        "Nenhuma escolha realizada";
+
+    resultado.innerHTML = "";
+
+    status.textContent =
+        "🟢 PRONTO PARA O SORTEIO";
+
+    inputs.forEach(
+        input=>{
+            input.value="";
+        }
+    );
+
+    start.disabled = false;
+
+    novo.disabled = false;
+
+    confirmar.disabled = false;
+
+    aleatoria.disabled = false;
+
+}
+
+
+/* =====================================================
+   ÁUDIO
+===================================================== */
+
+function prepararAudio(){
+
+    if(!somAtivo)
+        return;
+
+    try{
+
+        if(!audioContext){
+
+            audioContext =
+                new (
+                    window.AudioContext ||
+                    window.webkitAudioContext
+                )();
+
+        }
+
+        if(
+            audioContext.state ===
+            "suspended"
+        ){
+
+            audioContext.resume();
+
+        }
+
+    }catch(e){}
+
+}
+
+
+/* =====================================================
+   SOM DE SORTEIO
+===================================================== */
+
+function iniciarSomSorteio(){
+
+    if(!somAtivo)
+        return;
+
+    prepararAudio();
+
+    if(!audioContext)
+        return;
+
+    const osc =
+        audioContext.createOscillator();
+
+    const gain =
+        audioContext.createGain();
+
+    osc.type =
+        "sawtooth";
+
+    gain.gain.value =
+        .025;
+
+    osc.connect(gain);
+
+    gain.connect(
+        audioContext.destination
+    );
+
+    osc.start();
+
+    const intervalo =
+        setInterval(()=>{
+
+            if(!sorteando){
+
+                clearInterval(
+                    intervalo
+                );
+
+                try{
+                    osc.stop();
+                }catch(e){}
+
+                return;
+
+            }
+
+            osc.frequency.value =
+                100 +
+                Math.random()*300;
+
+        },100);
+
+}
+
+
+/* =====================================================
+   PARAR SOM
+===================================================== */
+
+function pararSom(){
+
+}
+
+
+/* =====================================================
+   SOM DE VITÓRIA
+===================================================== */
+
+function tocarSomVitoria(){
+
+    if(!somAtivo)
+        return;
+
+    prepararAudio();
+
+    if(!audioContext)
+        return;
+
+    const notas =
+        [
+            523,
+            659,
+            784,
+            1047
+        ];
+
+    notas.forEach(
+        (nota,index)=>{
+
+            setTimeout(
+                ()=>{
+
+                    const osc =
+                        audioContext
+                        .createOscillator();
+
+                    const gain =
+                        audioContext
+                        .createGain();
+
+                    osc.type =
+                        "sine";
+
+                    osc.frequency.value =
+                        nota;
+
+                    gain.gain.value =
+                        .12;
+
+                    osc.connect(gain);
+
+                    gain.connect(
+                        audioContext.destination
+                    );
+
+                    osc.start();
+
+                    gain.gain
+                        .exponentialRampToValueAtTime(
+                            .001,
+                            audioContext
+                            .currentTime+.5
+                        );
+
+                    osc.stop(
+                        audioContext
+                        .currentTime+.5
+                    );
+
+                },
+                index*150
+            );
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   SOM DE RESULTADO
+===================================================== */
+
+function tocarSomResultado(){
+
+    if(!somAtivo)
+        return;
+
+    prepararAudio();
+
+    if(!audioContext)
+        return;
+
+    const osc =
+        audioContext
+        .createOscillator();
+
+    const gain =
+        audioContext
+        .createGain();
+
+    osc.type =
+        "triangle";
+
+    osc.frequency.value =
+        180;
+
+    gain.gain.value =
+        .08;
+
+    osc.connect(gain);
+
+    gain.connect(
+        audioContext.destination
+    );
+
+    osc.start();
+
+    osc.frequency
+        .exponentialRampToValueAtTime(
+            80,
+            audioContext
+            .currentTime+.5
+        );
+
+    gain.gain
+        .exponentialRampToValueAtTime(
+            .001,
+            audioContext
+            .currentTime+.5
+        );
+
+    osc.stop(
+        audioContext
+        .currentTime+.5
+    );
+
+}
+
+
+/* =====================================================
+   SOM ON / OFF
+===================================================== */
+
+som.addEventListener(
+    "click",
+    ()=>{
+
+        somAtivo =
+            !somAtivo;
+
+        som.textContent =
+            somAtivo
+            ? "🔊 SOM"
+            : "🔇 SOM";
+
+    }
+);
+
+
+/* =====================================================
+   TELA CHEIA
+===================================================== */
+
+fullscreen.addEventListener(
+    "click",
+    async()=>{
+
+        try{
+
+            if(
+                !document.fullscreenElement
+            ){
+
+                await document
+                    .documentElement
+                    .requestFullscreen();
+
+            }else{
+
+                await document
+                    .exitFullscreen();
+
+            }
+
+        }catch(e){
+
+            alert(
+                "Tela cheia não disponível."
+            );
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   FIM
+===================================================== */
+
+fim.addEventListener(
+    "click",
+    ()=>{
+
+        if(sorteando){
+
+            clearTimeout(timer);
+
+            sorteando =
+                false;
+
+            numero.classList.remove(
+                "girando"
+            );
+
+        }
+
+        modal.classList.add(
+            "show"
+        );
+
+    }
+);
+
+
+/* =====================================================
+   CANCELAR FIM
+===================================================== */
+
+cancelarFim.addEventListener(
+    "click",
+    ()=>{
+
+        modal.classList.remove(
+            "show"
+        );
+
+    }
+);
+
+
+/* =====================================================
+   CONFIRMAR FIM
+===================================================== */
+
+confirmarFim.addEventListener(
+    "click",
+    ()=>{
+
+        document.body.innerHTML = `
+
+            <div style="
+                min-height:100vh;
+                background:#050505;
+                color:white;
+                display:flex;
+                flex-direction:column;
+                align-items:center;
+                justify-content:center;
+                text-align:center;
+                font-family:Arial;
+                padding:20px;
+            ">
+
+                <div style="
+                    font-size:70px;
+                    margin-bottom:20px;
+                ">
+                    🎰
+                </div>
+
+                <h1 style="
+                    color:#ffd700;
+                    margin-bottom:15px;
+                ">
+                    JOGO ENCERRADO
+                </h1>
+
+                <p style="
+                    color:#999;
+                    margin-bottom:25px;
+                ">
+                    Obrigado por jogar!
+                </p>
+
+                <button
+                    onclick="location.reload()"
+                    style="
+                        padding:16px 28px;
+                        border:0;
+                        border-radius:12px;
+                        background:#ffd700;
+                        color:#111;
+                        font-weight:bold;
+                        cursor:pointer;
+                    "
+                >
+                    VOLTAR AO JOGO
+                </button>
+
+            </div>
+
+        `;
+
+    }
+);
+
+
+/* =====================================================
+   HISTÓRICO
+===================================================== */
+
+function atualizarHistorico(){
+
+    if(historico.length === 0){
+
+        historicoEl.innerHTML = `
+
+            <div class="empty">
+                Nenhuma rodada realizada.
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    let html = `
+
+        <table class="history">
+
+            <thead>
+
+                <tr>
+
+                    <th>RODADA</th>
+
+                    <th>SUA MILHAR</th>
+
+                    <th>SORTEADA</th>
+
+                    <th>RESULTADO</th>
+
+                    <th>MULTIPLICADOR</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+    `;
+
+
+    historico.forEach(
+        item=>{
+
+            html += `
+
+                <tr>
+
+                    <td>
+                        ${String(
+                            item.rodada
+                        ).padStart(2,"0")}
+                    </td>
+
+                    <td>
+                        ${item.escolhida}
+                    </td>
+
+                    <td>
+                        ${item.sorteada}
+                    </td>
+
+                    <td>
+                        ${
+                            item.acertou
+                            ? "🏆 " + item.tipo
+                            : "❌ NÃO ACERTO"
+                        }
+                    </td>
+
+                    <td style="
+                        color:${
+                            item.acertou
+                            ? "#ffd700"
+                            : "#777"
+                        };
+                        font-weight:bold;
+                    ">
+                        ${item.multiplicador}
+                    </td>
+
+                </tr>
+
+            `;
+
+        }
+    );
+
+
+    html += `
+
+            </tbody>
+
+        </table>
+
+    `;
+
+
+    historicoEl.innerHTML =
+        html;
+
+}
+
+
+/* =====================================================
+   ESTATÍSTICAS
+===================================================== */
+
+function atualizarEstatisticas(){
+
+    rodadasEl.textContent =
+        rodadas;
+
+    acertosEl.textContent =
+        acertos;
+
+    naoAcertosEl.textContent =
+        naoAcertos;
+
+    const porcentagem =
+        rodadas === 0
+        ? 0
+        : (
+            acertos /
+            rodadas *
+            100
+        ).toFixed(1);
+
+    taxaEl.textContent =
+        porcentagem+"%";
+
+}
+
+
+/* =====================================================
+   ATUALIZAR TUDO
+===================================================== */
+
+function atualizarTudo(){
+
+    atualizarHistorico();
+
+    atualizarEstatisticas();
+
+}
+
+
+/* =====================================================
+   LIMPAR HISTÓRICO
+===================================================== */
+
+limpar.addEventListener(
+    "click",
+    ()=>{
+
+        historico = [];
+
+        atualizarHistorico();
+
+    }
+);
+
+
+/* =====================================================
+   CONFETES
+===================================================== */
+
+function criarConfetes(){
+
+    for(
+        let i=0;
+        i<100;
+        i++
+    ){
+
+        const confete =
+            document.createElement(
+                "div"
+            );
+
+        confete.className =
+            "confete";
+
+        confete.style.left =
+            Math.random()*100+
+            "vw";
+
+        confete.style.background =
+            [
+                "#ffd700",
+                "#ff0000",
+                "#00d4ff",
+                "#00ff55",
+                "#ffffff",
+                "#ff00ff"
+            ][
+                Math.floor(
+                    Math.random()*6
+                )
+            ];
+
+        confete.style.animationDuration =
+            (
+                2+
+                Math.random()*3
+            )+"s";
+
+        document.body.appendChild(
+            confete
+        );
+
+        setTimeout(
+            ()=>{
+                confete.remove();
+            },
+            5000
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   INICIALIZAÇÃO
+===================================================== */
+
+atualizarTudo();
+
+</script>
+
+</body>
+</html>
